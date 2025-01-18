@@ -6,7 +6,7 @@ import { getLocalStorage } from "@utils/getLocalStorage";
 // Create an Axios instance with the base URL
 const instance = axios.create({
  //baseURL: "http://localhost/finance_backend/",
-  baseURL: "https://crm.twmresearchalert.com/gateway",
+  baseURL: "https://kycapi.twmresearchalert.com",
 });
 
 // Function to make a request with or without the access token

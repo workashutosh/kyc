@@ -59,8 +59,8 @@ const Header = () => {
   return (
     <header className="sticky top-0 left-0 z-50 flex items-center justify-between px-8 py-2 bg-white shadow-gray-400 shadow-md">
       <Link to="/">
-        <p className="font-bold p-1 text-sm bg-blue-800 rounded-md text-white">
-          TWM - CRM
+        <p className="font-bold px-4 py-1 text-sm bg-blue-800 rounded-md text-white">
+          KYC - TWM
         </p>
       </Link>
 

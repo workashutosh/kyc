@@ -2,7 +2,7 @@ import { useLocation, Link } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import IMAGES from "@images";
 import { AppContext } from "@context/AppContext";
-import { Home, BarChart2, UserRound , Tag , LayoutDashboard , Phone  } from "lucide-react"; 
+import { Home, CircleGauge , UserRound , Tag , LayoutDashboard , WalletCards  } from "lucide-react"; 
 
 // Navigation configuration based on user position
 const navigationConfig = {
@@ -10,41 +10,19 @@ const navigationConfig = {
     {
       path: '/',
       label: 'Dashboard',
-      icon: Home
+      icon: CircleGauge
     },
     {
-      path: '/assignLeads',
-      label: 'Assign Leads',
-      icon: BarChart2
+      path: '/cred',
+      label: 'Credentails',
+      icon: WalletCards
     },
-    {
-      path: '/ManageEmp',
-      label: 'Employee Management',
-      icon: UserRound
-    },
-    {
-      path: '/whatsappLeads',
-      label: 'Whatsapp',
-      icon: Phone,
-      iconWrapper: true
-    }
   ],
   sales: [
     {
-      path: '/salesDashhboard',
-      label: 'Sales Dashboard',
+      path: '/userDashhboard',
+      label: 'Dashboard',
       icon: LayoutDashboard
-    },
-    {
-      path: '/tagLead',
-      label: 'Tag Leads',
-      icon: Tag
-    },
-    {
-      path: '/tagWhatsappLead',
-      label: 'Whatsapp',
-      icon: Phone,
-      iconWrapper: true
     }
   ]
 };

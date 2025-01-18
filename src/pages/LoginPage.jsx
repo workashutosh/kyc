@@ -10,6 +10,8 @@ import axiosInstance from "../api/axiosInstance";
 import { useLoggerStore } from "@store/log.jsx";
 import LoaderComponent from "../components/common/LoaderComponent";
 import { EyeClosed, Eye } from 'lucide-react';
+import useStore from "@store";
+
 
 const LoginPage = () => {
   const { setActiveUserData, activeUserData } = useContext(AppContext);
@@ -17,8 +19,10 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [userPlatform, setUserPlatform] = useState(null);
   const [loaderActive, setLoaderActive] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
+  const [showPassword, setShowPassword] = useState(false); 
   const navigate = useNavigate();
+  const { updateUserDetails } = useStore();
+
 
   const { updateActivityLog, initializeLogData } = useLoggerStore();
 
@@ -73,24 +77,24 @@ const LoginPage = () => {
         platform: userPlatform
       });
 
-      handleLogCheck(`Login Success for ${whatsAppNumber}`);
       setActiveUserData({
         user_name: res?.data?.data?.user_name,
         user_id: res?.data?.data?.user_id,
         user_position: res?.data?.data?.user_role,
       });
+       
 
       setLocalStorage(
         res?.data?.data?.access_token,
         res?.data?.data?.access_token_expiry,
         res?.data?.data?.refresh_token,
         res?.data?.data?.refresh_token_expiry,
-        res?.data?.data?.session_id
+        res?.data?.data?.session_id,
+        res?.data?.data?.user_role
       );
       navigate("/");
     } catch (error) {
       toast.error(error?.response?.data?.messages[0] || "Login failed");
-      handleLogCheck(`Login Failed for ${whatsAppNumber}`);
     } finally {
       setLoaderActive(false);
     }
@@ -121,7 +125,7 @@ const LoginPage = () => {
           <div className="flex items-center rounded-lg border border-gray-300 bg-gray-50 p-2.5">
             <input
               className="w-full bg-transparent pl-3 font-medium text-gray-700 outline-none"
-              type="number"
+              type="text"
               placeholder="Username"
               maxLength={10}
               value={whatsAppNumber}

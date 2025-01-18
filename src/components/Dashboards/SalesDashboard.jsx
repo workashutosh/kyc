@@ -96,15 +96,18 @@ const SalesDashboard = () => {
     <Header />
     {loaderActive && <LoaderComponent />}
     <main className="flex">
-      <Sidebar
+      {/* <Sidebar
         isSidebarVisible={isSidebarVisible}
         setIsSidebarVisible={setIsSidebarVisible}
-        />
+        /> */}
    
       <section className="flex-1 my-4 ml-4 mr-7">
-      <div className="w-full border p-1 bg-white shadow-sm rounded-md flex justify-between">
-        <div>
-          <h1>Sales Dashboard for sales employees</h1>
+      <div className="w-full p-1  rounded-md flex flex-col select-none">
+        <div className=" border-b-2 pb-2">
+          <h1 className="font-bold text-sm">Welcome to Trade with market KYC Portal</h1>
+        </div>
+        <div className=" mt-3 font-mono flex">
+          <p >KYC Status : </p> <span className="ml-2 text-green-600 text-xs mt-1"> Approved </span> 
         </div>
       </div>
       </section>

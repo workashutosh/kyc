@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import Header from "@components/common/Header";
 import Sidebar from "@components/common/Sidebar";
+import { useLocation, Link, useNavigate } from "react-router-dom";
+import { AppContext } from "@context/AppContext";
 
 
 const Dashboard = () => {
   // Sidebar State
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const { activeUserData } = useContext(AppContext);
+  const navigate = useNavigate();
+  if(activeUserData && (activeUserData?.user_position !== '1' || activeUserData?.user_position !== '2')){
+    navigate("/userDashhboard");
+  }
 
   return (
     <>

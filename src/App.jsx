@@ -1,14 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AppProvider } from "./context/AppContext";
+import { AppProvider , AppContext } from "./context/AppContext";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useStore from "@store";
 
+
 // Page imports
 import LoginPage from "@pages/LoginPage";
 import Dashboard from "@pages/Dashboard";
 import SalesDashboard from "@components/Dashboards/SalesDashboard";
+import Credentails from "@pages/Credentials";
 
 // Route configuration
 const routes = [
@@ -25,7 +27,14 @@ const routes = [
     role: "admin"
   },
   {
-    path: "/userDashboard",
+    path: "/cred",
+    element: Credentails,
+    protected: true,
+    key: "Credentails-page",
+    role: "admin"
+  },
+  {
+    path: "/userDashhboard",
     element: SalesDashboard,
     protected: true,
     key: "salesDashboard-page",
@@ -35,6 +44,7 @@ const routes = [
 
 const App = () => {
   const { userDetails } = useStore();
+
 
   const renderRoute = (route) => {
     const Component = route.element;

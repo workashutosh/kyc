@@ -7,19 +7,22 @@ import { getLocalStorage } from "@utils/getLocalStorage";
 import { setLocalStorage } from "@utils/setLocalStorage";
 import axiosInstance from "@api/axiosInstance";
 import Loader from "@common/Loader";
+import useStore from "@store";
+
 
 const ProtectedRoute = ({ element }) => {
   const navigate = useNavigate();
 
   // getting the function from context to set the active user
-  const { setActiveUserData, setDropDownValues } = useContext(AppContext);
+  const { setActiveUserData, activeUserData } = useContext(AppContext);
+
+  const { updateUserDetails , userDetails } = useStore();
 
   // loading state
   const [loading, setLoading] = useState(false);
 
   // verifying the user
   const verifyUser = async () => {
-   // setLoading(true);
 
     // checking if the data is available in the local storage
     try {
@@ -31,6 +34,7 @@ const ProtectedRoute = ({ element }) => {
     }
 
     const lsData = getLocalStorage();
+
 
     if (lsData) {
       axiosInstance(
@@ -61,13 +65,20 @@ const ProtectedRoute = ({ element }) => {
               user_position: responseData?.data?.data?.user_role,
             });
 
+            updateUserDetails({
+               user_name: responseData?.data?.data?.user_name,
+               user_id: responseData?.data?.data?.user_id,
+               user_position: responseData?.data?.data?.user_role,
+             });
+
             // setting the local storage
             setLocalStorage(
               responseData?.data?.data?.access_token,
               responseData?.data?.data?.access_token_expiry,
               responseData?.data?.data?.refresh_token,
               responseData?.data?.data?.refresh_token_expiry,
-              responseData?.data?.data?.session_id
+              responseData?.data?.data?.session_id,
+              responseData?.data?.data?.user_role
             );
           }
         })

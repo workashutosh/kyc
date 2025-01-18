@@ -6,7 +6,8 @@ export const setLocalStorage = (
   access_token_expiry,
   refresh_token,
   refresh_token_expiry,
-  session_id
+  session_id,
+  position
 ) => {
   const data = {
     access_token: access_token,
@@ -14,6 +15,7 @@ export const setLocalStorage = (
     refresh_token: refresh_token,
     refresh_token_expiry: refresh_token_expiry,
     session_id: session_id,
+    position: position,
   };
   secureLocalStorage.setItem("data", data);
 };
