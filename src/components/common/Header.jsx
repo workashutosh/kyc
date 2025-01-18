@@ -1,47 +1,38 @@
 import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
-import IMAGES from "@images";
 import { AppContext } from "@context/AppContext";
 import { getLocalStorage } from "@utils/getLocalStorage";
 import axiosInstance from "@api/axiosInstance";
 import { useLoggerStore } from "@store/log.jsx";
-import { UserRound } from "lucide-react";
+import { UserRound, Menu, X } from "lucide-react";
 import apiInstance from "@api/apiInstance";
-
+import logo from "../../../public/logo.png";
 
 const Header = () => {
   const { activeUserData, setActiveUserData } = useContext(AppContext);
   const { updateActivityLog, initializeLogData } = useLoggerStore();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   
   const username = activeUserData?.user_name;
 
-  const handleLogCheck = async (log) => {
-    updateActivityLog(log);
-  }
- 
   useEffect(() => {
     initializeLogData(activeUserData);
   }, [activeUserData, initializeLogData]);
 
   const handleLogout = async () => {
-    if (isLoggingOut) return; // Prevent double-clicks
+    if (isLoggingOut) return;
     setIsLoggingOut(true);
     const lsData = getLocalStorage();
 
-    // Immediately clear local storage and update UI state
     secureLocalStorage.clear("data");
     setActiveUserData(null);
-
-    // Start the navigation
     navigate("/login");
    
-    // Send logout request in the background
     try {
-        
-      if (lsData && lsData?.session_id && lsData?.access_token) {
+      if (lsData?.session_id && lsData?.access_token) {
         const response = await apiInstance(`/users.php`, 'DELETE', {"session_id": lsData?.session_id});
         await axiosInstance(
           `/session/logout?session=${lsData.session_id}`,
@@ -52,44 +43,71 @@ const Header = () => {
       }
     } catch (error) {
       console.error("Logout request failed:", error);
-      // We don't need to handle this error since the user is already being redirected
     }
   };
 
   return (
-    <header className="sticky top-0 left-0 z-50 flex items-center justify-between px-8 py-2 bg-white shadow-gray-400 shadow-md">
-      <Link to="/">
-        <p className="font-bold px-4 py-1 text-sm bg-blue-800 rounded-md text-white">
-          KYC - TWM
-        </p>
-      </Link>
+    <header className="sticky top-0 left-0 z-50 bg-white shadow-md">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex-shrink-0">
+            <img src={logo} alt="logo" className="h-8 w-auto sm:h-10" />
+          </Link>
 
-      <div className="flex">
-        <div className="group bg-[#0052CC] relative flex cursor-pointer items-center rounded-[40px] border border-solid border-gray-200 py-[1px] pl-[1px] shadow-md">
-          <UserRound 
-            size={27}
-            color="white"
-          />
-          
-          <div className="invisible absolute right-1 top-12 w-42 rounded-md border border-[#b58eef] h-[100px] bg-white py-1 px-2 shadow-md transition-all ease-in-out group-hover:visible">
-            <div className="w-[300px] bg-white">
-              <p className="text-xs mt-1 font-semibold font-sans">Account Name {activeUserData?.user_position}</p>
-              <div className="mt-2 border-b mb-2">
-                <span className="text-sm font-sans text-[#4A5157]">{username}</span>
-              </div>
-              <div className="hover:bg-[#b596e2] hover:text-white rounded-md px-2 font-sans">
-                <button 
-                  className="text-sm w-full text-left py-1" 
+          {/* Desktop menu */}
+          <div className="hidden sm:flex sm:items-center">
+            {username && (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-700">{username}</span>
+                <button
                   onClick={handleLogout}
                   disabled={isLoggingOut}
+                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   {isLoggingOut ? 'Logging out...' : 'Logout'}
                 </button>
               </div>
-            </div>
-          </div> 
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="sm:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <div className="sm:hidden bg-white border-t">
+          <div className="px-4 py-3 space-y-3">
+            {username && (
+              <>
+                <div className="text-sm text-gray-700">
+                  Signed in as: <span className="font-medium">{username}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                >
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 };

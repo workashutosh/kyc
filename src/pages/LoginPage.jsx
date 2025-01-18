@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from "react";
-import IMAGES from "../images";
 import { toast } from "react-toastify";
 import { getUserPlatform } from "../utils/getUserPlatform";
 import { useNavigate } from "react-router-dom";
@@ -9,26 +8,22 @@ import { getLocalStorage } from "../utils/getLocalStorage";
 import axiosInstance from "../api/axiosInstance";
 import { useLoggerStore } from "@store/log.jsx";
 import LoaderComponent from "../components/common/LoaderComponent";
-import { EyeClosed, Eye } from 'lucide-react';
+import { EyeClosed, Eye, Lock, UserPlus } from 'lucide-react';
 import useStore from "@store";
-
+import logo from "../../public/logo.png"
+import minor from "../../public/minor.png"
 
 const LoginPage = () => {
   const { setActiveUserData, activeUserData } = useContext(AppContext);
-  const [whatsAppNumber, setWhatsAppNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    whatsAppNumber: "",
+    password: "",
+  });
   const [userPlatform, setUserPlatform] = useState(null);
   const [loaderActive, setLoaderActive] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { updateUserDetails } = useStore();
-
-
   const { updateActivityLog, initializeLogData } = useLoggerStore();
-
-  const handleLogCheck = async (log) => {
-    updateActivityLog(log);
-  }
 
   useEffect(() => {
     initializeLogData(activeUserData);
@@ -36,7 +31,6 @@ const LoginPage = () => {
 
   useEffect(() => {
     setUserPlatform(getUserPlatform());
-
     try {
       if (getLocalStorage()) {
         window.location.href = "/";
@@ -45,26 +39,19 @@ const LoginPage = () => {
   }, []);
 
   const handleInputChange = (e) => {
-    if (e.target.value.length <= 10) {
-      setWhatsAppNumber(e.target.value);
-    }
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+    const { name, value } = e.target;
+    if (name === "whatsAppNumber" && value.length > 10) return;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleLogin = async () => {
     setLoaderActive(true);
     const regex = /^[6-9]\d{9}$/;
 
-    // if (!regex.test(whatsAppNumber)) {
-    //   toast.error("Invalid Number");
-    //   setLoaderActive(false);
-    //   return;
-    // }
-
-    if (!password) {
+    if (!formData.password) {
       toast.error("Please enter password");
       setLoaderActive(false);
       return;
@@ -72,8 +59,8 @@ const LoginPage = () => {
 
     try {
       const res = await axiosInstance("/session", "POST", {
-        number: whatsAppNumber,
-        password: password,
+        number: formData.whatsAppNumber,
+        password: formData.password,
         platform: userPlatform
       });
 
@@ -82,7 +69,6 @@ const LoginPage = () => {
         user_id: res?.data?.data?.user_id,
         user_position: res?.data?.data?.user_role,
       });
-       
 
       setLocalStorage(
         res?.data?.data?.access_token,
@@ -111,51 +97,59 @@ const LoginPage = () => {
   };
 
   return (
-    <section className="bg-gray-50 flex h-screen items-center justify-center px-6 py-10">
+    <section className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-6 py-10">
       {loaderActive && <LoaderComponent />}
-      <div className="w-full max-w-md space-y-8 rounded-xl border border-gray-200 bg-white px-10 py-8 shadow-lg">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-800">KYC Login</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Please enter your User ID and password sent on your mail while registration to log in.
-          </p>
-        </div>
-
-        <div className="mt-8 space-y-6">
-          <div className="flex items-center rounded-lg border border-gray-300 bg-gray-50 p-2.5">
-            <input
-              className="w-full bg-transparent pl-3 font-medium text-gray-700 outline-none"
-              type="text"
-              placeholder="Username"
-              maxLength={10}
-              value={whatsAppNumber}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-            />
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          <div className="text-center space-y-2 items-center">
+            <h2 className="text-xl flex justify-center gap-1 font-bold text-[#0052CC]">
+            <img src={minor} alt="logo" className="w-[25px] mt-1  h-[20px]" /> Login
+            </h2>
+            <p className="text-sm text-gray-600">
+              Please enter your credentials to continue
+            </p>
           </div>
 
-          <div className="relative flex items-center rounded-lg border border-gray-300 bg-gray-50 p-2.5">
-            <input
-              className="w-full bg-transparent pl-3 font-medium text-gray-700 outline-none"
-              type={showPassword ? "text" : "password"} // Toggle between password and text
-              placeholder="Password"
-              value={password}
-              onChange={handlePasswordChange}
-              onKeyPress={handleKeyPress}
-            />
-            <button
-              type="button"
-              className="absolute right-3"
-              onClick={togglePasswordVisibility}
-            >
-              {showPassword ? <Eye /> : < EyeClosed />} {/* Toggle icon */}
-            </button>
-          </div>
+          <div className="space-y-4">
+            <div className="space-y-4">
+              <div className="relative">
+                <UserPlus className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <input
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                  type="text"
+                  placeholder="Username"
+                  name="whatsAppNumber"
+                  maxLength={10}
+                  value={formData.whatsAppNumber}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                />
+              </div>
 
-          <div className="justify-center flex">
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <input
+                  className="w-full pl-10 pr-12 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={handleLogin}
-              className="w-[40%] justify-center rounded-lg bg-blue-600 text-sm py-2 font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
             >
               Login
             </button>
